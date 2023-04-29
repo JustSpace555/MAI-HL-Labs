@@ -1,0 +1,12 @@
+@startuml context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(moderator, "Модератор")
+Person(user, "Пользователь")
+
+System(social_network, "Социальная сеть", "Веб-сайт для обмена сообщениями и новостями")
+
+Rel(moderator, social_network, "Модерация контента и пользователей")
+Rel(user, social_network, "Регистрация, отправка и принятие сообщений, создание поста на пользовательскую ленту, чтение всей ленты")
+
+@endumlT
