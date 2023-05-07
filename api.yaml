@@ -1,0 +1,301 @@
+openapi: 3.0.0
+info:
+  title: socialnetworkapi
+  version: 1.0.0
+servers:
+  - url: http://localhost:5055
+paths:
+#------------------------------
+  /chat:
+    get:
+      tags:
+        - default
+      summary: get_chat_by_id
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          example: '1'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - default
+      summary: create_new_chat
+      requestBody:
+        content: {}
+      parameters:
+        - name: sender_id
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - name: receiver_id
+          in: query
+          schema:
+            type: integer
+          example: '1'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /chat/get_all:
+    /get:
+      tags:
+        - default
+      summary: get_all_chats_by_sender_id
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          example: '1'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /chat/message:
+    get:
+      tags:
+        - default
+      summary: get_message_by_id
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          example: '1'
+      resoponses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - default
+      summary: post_new_message
+      parameters:
+        - name: chat_id
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - name: sender_id
+          schema:
+            type: integer
+          example: '1'
+            requestBody:
+      required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  example: 'aslkdfjasdfsd'
+  /chat/message/get_all:
+    get:
+      tags:
+        - default
+      summary: get_all_messages_by_chat_id
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          example: '1'
+      responses:
+        '200':
+          description: Succesful response
+          content:
+            application/json: {}
+#------------------------------
+  /wall:
+    get:
+      tags:
+        - default
+      summary: get_all_posts_on_user_wall
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          example: '1'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /wall/post:
+    get:
+      tags:
+        - default
+      summary: get_post_by_id
+      parameters:
+        - name: post_id
+          in: query
+          schema:
+            type: integer
+          example: '1'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - default
+      summary: add_new_post_to_user_wall
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                post_content:
+                  type: string
+                  example: 'post_content_asldfkjaslkdfkjla'
+                creation_date:
+                  type: string
+                  example: '22.12.2004'
+      parameters:
+        - name: user_id
+          in: query
+          schema:
+            type: integer
+          example: '1293'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+#------------------------------
+  /user:
+    get:
+      tags:
+        - default
+      summary: getuser
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          example: '1'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - default
+      summary: adduser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                  example: 'Ivan'
+                last_name:
+                  type: string
+                  example: 'Ivanov'
+                login:
+                  type: string
+                  example: 'iivvov'
+                password:
+                  type: string
+                  example: 'sadlflasf'
+                email:
+                  type: string
+                  example: 'iivvov@gmail.com'
+                phone_number:
+                  type: string
+                  example: '88005553535'
+                birth_date:
+                  type: string
+                  example: '22.12.2003'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/auth:
+    get:
+      tags:
+        - default
+      summary: auth_by_login_or_email_or_phone_number
+      parameters:
+        - name: by
+          in: query
+          schema:
+            type: string
+          example: 'login | email | phone_number'
+        - name: param
+          in: query
+          schema:
+            type: string
+          example: 'iivvov | iivvov@gmail.com | 88005553535'
+        - name: password
+          in: query
+          schema:
+            type: string
+          example: 'asdlfasf'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: User not found
+  /user/find:
+    post:
+      tags:
+        - default
+      summary: find_user_by_login_or_email_or_phone_number_or_name
+      parameters:
+        - name: by
+          in: query
+          schema:
+            type: string
+          example: 'login | email | phone_number | name'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                  example: 'Ivan'
+                last_name:
+                  type: string
+                  example: 'Ivanov'
+                login:
+                  type: string
+                  example: 'iivvov'
+                email:
+                  type: string
+                  example: 'iivvov@gmail.com'
+                phone_number:
+                  type: string
+                  example: '88005553535'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '404':
+          description: User not found
