@@ -30,7 +30,7 @@ namespace models
                         << "`user_first_id` int(100) not null,"
                         << "`user_second_id` int(100) not null,"
                         << "primary key (`id`),"
-                        << "key `user_first_id_index` (`user_first_id`)"
+                        << "key `user_first_id_index` (`user_first_id`),"
                         << "key `user_second_id_index` (`user_second_id`)"
                         << ");",
                         now;
@@ -80,7 +80,7 @@ namespace models
             Poco::Data::Statement select(db_session);
             Chat chat;
 
-            select << "select id, sender_id, receiver_id fromt chats_table where id=?",
+            select << "select id, user_first_id, user_second_id from chats_table where id=?",
                     into(chat.chat_id),
                     into(chat.sender_id),
                     into(chat.receiver_id),
@@ -111,7 +111,7 @@ namespace models
             std::vector<Chat> output_chats;
             Chat chat;
 
-            select << "select id, sender_id, receiver_id from chats_table where sender_id=?",
+            select << "select id, user_first_id, user_second_id from chats_table where sender_id=?",
                     into(chat.chat_id),
                     into(chat.sender_id),
                     into(chat.receiver_id),
@@ -146,7 +146,7 @@ namespace models
             Poco::Data::Session db_session = database::Database::get_instance().create_database_session();
             Poco::Data::Statement insert(db_session);
 
-            insert << "insert into chats_table (sender_id, receiver_id) values(?, ?)",
+            insert << "insert into chats_table (user_first_id, user_second_id) values(?, ?)",
                     use(sender_id),
                     use(receiver_id);
             insert.execute();

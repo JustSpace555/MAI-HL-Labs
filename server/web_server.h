@@ -72,7 +72,7 @@ class WebServer : public Poco::Util::ServerApplication
                 models::Post::init();
                 models::Message::init();
 
-                ServerSocket svs(Poco::Net::SocketAddress("0.0.0.0", 5055));
+                ServerSocket svs(Poco::Net::SocketAddress("0.0.0.0", 8080));
                 HTTPServer srv(new HTTPRequestFactory(DateTimeFormat::SORTABLE_FORMAT), svs, new HTTPServerParams);
                 srv.start();
                 waitForTerminationRequest();

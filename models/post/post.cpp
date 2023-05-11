@@ -30,8 +30,8 @@ namespace models
                         << "("
                         << "`id` int not null auto_increment,"
                         << "`user_id` int(100) not null,"
-                        << "`content` varchar(256) not null"
-                        << "`creation_date` varchar(10) not null"
+                        << "`content` varchar(256) not null,"
+                        << "`creation_date` varchar(10) not null,"
                         << "primary key (`id`), key `post_user_id_index` (`user_id`)"
                         << ");",
                         now;

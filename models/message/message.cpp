@@ -30,8 +30,8 @@ namespace models
                         << "("
                         << "`id` int not null auto_increment,"
                         << "`chat_id` int(100) not null,"
-                        << "`user_sender_id` int(100) not null"
-                        << "`content` varchar(256) not null"
+                        << "`user_sender_id` int(100) not null,"
+                        << "`content` varchar(256) not null,"
                         << "primary key (`id`), key `message_chat_id_index` (`chat_id`)"
                         << ");",
                         now;

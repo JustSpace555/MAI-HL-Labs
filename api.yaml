@@ -3,7 +3,7 @@ info:
   title: socialnetworkapi
   version: 1.0.0
 servers:
-  - url: http://localhost:5055
+  - url: http://localhost:8082
 paths:
 #------------------------------
   /chat:

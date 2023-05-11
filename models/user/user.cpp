@@ -35,12 +35,11 @@ namespace models
                             << "`user_login` varchar(64) not null,"
                             << "`user_password` varchar(64) not null,"
                             << "`user_email` varchar(256) null,"
-                            << "`user_phone_number` varchar(11)"
+                            << "`user_phone_number` varchar(11),"
                             << "`user_birth_date` varchar(10) null,"
-                            << "primary key (`id`), key `user_first_name_index` (`first_name`), key `user_last_name_index` (`last_name`)"
+                            << "primary key (`user_id`), key `user_first_name_index` (`user_first_name`), key `user_last_name_index` (`user_last_name`)"
                             << ");",
                             now;
-                std::cout << create_stmt.toString() << std::endl;
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
@@ -399,7 +398,7 @@ namespace models
             Poco::Data::Session session = database::Database::get_instance().create_database_session();
             Poco::Data::Statement insert(session);
 
-            insert << "insert into users_table (first_name, last_name, login, password, email, phone_number, birth_date) values(?, ?, ?, ?, ?, ?)",
+            insert << "insert into users_table (first_name, last_name, login, password, email, phone_number, birth_date) values(?, ?, ?, ?, ?, ?, ?)",
                 use(user_first_name),
                 use(user_last_name),
                 use(user_login),

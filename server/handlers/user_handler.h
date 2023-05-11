@@ -268,7 +268,7 @@ class UserHandler : public HTTPRequestHandler
             }
             catch (...) {}
 
-            send_not_fount_exception("Request receiver with path: " + path + " not found", "", response);
+            send_not_fount_exception("Request receiver with path: " + path + " not found", "user", response);
         }
 
     private:

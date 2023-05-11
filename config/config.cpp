@@ -4,11 +4,16 @@
 
 Config::Config()
 {
-    host = std::getenv("DATABASE_HOST");
-    port = std::getenv("DATABASE_PORT");
-    login = std::getenv("DATABASE_LOGIN");
-    password = std::getenv("DATABASE_PASSWORD");
-    database_path = std::getenv("DATABASE_DATABASE");
+    host = "127.0.0.1";
+    port = "6033";
+    login = "login";
+    password = "password";
+    database_path = "archdb";
+    // host = std::getenv("DATABASE_HOST");
+    // port = std::getenv("DATABASE_PORT");
+    // login = std::getenv("DATABASE_LOGIN");
+    // password = std::getenv("DATABASE_PASSWORD");
+    // database_path = std::getenv("DATABASE_DATABASE");
 }
 
 Config &Config::get_instanse()
