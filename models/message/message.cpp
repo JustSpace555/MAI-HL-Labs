@@ -38,12 +38,12 @@ namespace models
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Database connection exception:" << e.what() << std::endl;
+            std::cout << "Database connection exception:" << e.message() << std::endl;
             throw;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
     }
@@ -53,7 +53,7 @@ namespace models
         Poco::JSON::Object::Ptr object = new Poco::JSON::Object();
 
         object->set("message_id", message_id);
-        object->set("char_id", chat_id);
+        object->set("chat_id", chat_id);
         object->set("content", content);
         object->set("user_sender_id", user_sender_id);
 
@@ -96,12 +96,12 @@ namespace models
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Database connection exception:" << e.what() << std::endl;
+            std::cout << "Database connection exception:" << e.message() << std::endl;
             throw;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
 
@@ -134,12 +134,12 @@ namespace models
         }
         catch(Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Connection exception:" << e.what() << std::endl;
+            std::cout << "Connection exception:" << e.message() << std::endl;
             throw;
         }
         catch(Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
         
@@ -154,7 +154,7 @@ namespace models
             Poco::Data::Session session = database::Database::get_instance().create_database_session();
             Poco::Data::Statement insert(session);
 
-            insert << "insert into message_table (chat_id, user_sender_id, content) VALUES(?, ?, ?)",
+            insert << "insert into messages_table (chat_id, user_sender_id, content) VALUES(?, ?, ?)",
                     use(chat_id),
                     use(user_sender_id),
                     use(content);
@@ -175,12 +175,12 @@ namespace models
         }
         catch(Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Connection exception:" << e.what() << std::endl;
+            std::cout << "Connection exception:" << e.message() << std::endl;
             throw;
         }
         catch(Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
     }

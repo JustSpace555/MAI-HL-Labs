@@ -21,6 +21,7 @@
 #include "Poco/Util/HelpFormatter.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/URI.h"
+#include "Poco/StreamCopier.h"
 #include <iostream>
 #include <iostream>
 #include <fstream>
@@ -64,13 +65,26 @@ class ChatHandler : public HTTPRequestHandler
             response.setContentType("application/json");
             Poco::URI uri = Poco::URI(request.getURI());
             std::string path = uri.getPath();
-            std::cout << "Path of chat request: " + path << std::endl;
+            std::string method = request.getMethod();
+            std::istream& stream = request.stream();
+
+            std::ostringstream oss;
+            Poco::StreamCopier::copyStream(stream, oss);
+            std::string requestBody = oss.str();
+            std::cout << "Request body = " + requestBody << std::endl;
+
+            HTMLForm form(request, stream);
 
             try 
             {
-                if (path == "/chat" && request.getMethod() == HTTPRequest::HTTP_GET)
+                if (path == "/chat" && method == HTTPRequest::HTTP_GET)
                 {
-                    int chatId = stoi(request.get("id", "0"));
+                    int chatId = stoi(form.get("id", "0"));
+                    if (chatId == 0)
+                    {
+                        send_not_found_exception("Missing param id", "/chat", response);
+                        return;
+                    }
                     std::optional<models::Chat> result = models::Chat::select_by_id(chatId);
 
                     if (result)
@@ -81,18 +95,23 @@ class ChatHandler : public HTTPRequestHandler
                     }
                     else
                     {
-                        send_not_fount_exception("Chat with id = " + std::to_string(chatId) + "not found", "/chat", response);
+                        send_not_found_exception("Chat with id = " + std::to_string(chatId) + " not found", "/chat", response);
                     }
                     return;
                 }
 
-                else if (path == "/chat" && request.getMethod() == HTTPRequest::HTTP_POST)
+                else if (path == "/chat" && method == HTTPRequest::HTTP_POST)
                 {
-                    int senderId = stoi(request.get("sender_id", "0"));
-                    int receiverId = stoi(request.get("receiver_id", "0"));
+                    int creator_id = stoi(form.get("creator_id", "0"));
+                    int receiverId = stoi(form.get("receiver_id", "0"));
+                    if (creator_id == 0 || receiverId == 0)
+                    {
+                        send_not_found_exception("Missing `creator_id` or `receiver_id` param", "/chat", response);
+                        return;                        
+                    }
 
                     models::Chat chat;
-                    chat.set_sender_id(senderId);
+                    chat.set_creator_id(creator_id);
                     chat.set_receiver_id(receiverId);
                     chat.save_to_db();
 
@@ -102,10 +121,15 @@ class ChatHandler : public HTTPRequestHandler
                     return;
                 }
 
-                else if (path == "/chat/get_all" && request.getMethod() == HTTPRequest::HTTP_GET)
+                else if (path == "/chat/get_all" && method == HTTPRequest::HTTP_GET)
                 {
-                    int senderId = stoi(request.get("id", "0"));
-                    std::vector<models::Chat> result = models::Chat::select_all_by_sender_id(senderId);
+                    int creator_id = stoi(form.get("id", "0"));
+                    if (creator_id == 0)
+                    {
+                        send_not_found_exception("Missing param `id`", "/chat/get_all", response);
+                        return;                        
+                    }
+                    std::vector<models::Chat> result = models::Chat::select_all_by_creator_id(creator_id);
                     Poco::JSON::Array output;
 
                     for (models::Chat chat : result) output.add(chat.to_json());
@@ -117,11 +141,16 @@ class ChatHandler : public HTTPRequestHandler
                     return;
                 }
 
-                else if (path == "/chat/message" && request.getMethod() == HTTPRequest::HTTP_GET)
+                else if (path == "/chat/message" && method == HTTPRequest::HTTP_GET)
                 {
-                    int messageId = stoi(request.get("id", "0"));
-                    std::optional<models::Message> result = models::Message::get_by_id(messageId);
+                    int messageId = stoi(form.get("id", "0"));
+                    if (messageId == 0)
+                    {
+                        send_not_found_exception("Missing param `id`", "/chat/message", response);
+                        return;                        
+                    }                    
 
+                    std::optional<models::Message> result = models::Message::get_by_id(messageId);
                     if (result)
                     {
                         response.setStatus(Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK);
@@ -130,32 +159,38 @@ class ChatHandler : public HTTPRequestHandler
                     }
                     else
                     {
-                        send_not_fount_exception("Message with id = " + std::to_string(messageId) + "not found", "/chat", response);
+                        send_not_found_exception("Message with id = " + std::to_string(messageId) + "not found", "/chat/message", response);
                     }
                     return;
                 }
 
                 else if (path == "/chat/message" && request.getMethod() == HTTPRequest::HTTP_POST)
                 {
-                    int chatId = stoi(request.get("chat_id", "0"));
-                    int senderId = stoi(request.get("sender_id", "0"));
+                    int chatId = stoi(form.get("chat_id", "0"));
+                    int creator_id = stoi(form.get("creator_id", "0"));
+                    if (chatId == 0 || creator_id == 0)
+                    {
+                        send_not_found_exception("Missing `chat_id` or `creator_id` param", "/chat/message", response);
+                        return;                                                
+                    }
+
                     std::string content = "";
                     models::Message message;
-
                     try
                     {
                         Poco::JSON::Parser parser;
-                        Poco::Dynamic::Var result = parser.parse(request.stream());
+                        Poco::Dynamic::Var result = parser.parse(requestBody);
                         Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
                         content = object->getValue<std::string>("content");
                     } catch (std::exception &e) {
                         std::cout << "Error parsing request body: " << e.what() << std::endl;
                         response.setStatus(HTTPResponse::HTTP_BAD_REQUEST);
+                        response.send();
                         return;
                     }
 
                     message.set_chat_id(chatId);
-                    message.set_sender_id(senderId);
+                    message.set_sender_id(creator_id);
                     message.set_content(content);
                     message.save_to_db();
 
@@ -165,9 +200,14 @@ class ChatHandler : public HTTPRequestHandler
                     return;
                 }
 
-                else if (path == "/chat/message/get_all" && request.getMethod() == HTTPRequest::HTTP_GET)
+                else if (path == "/chat/message/get_all" && method == HTTPRequest::HTTP_GET)
                 {
-                    int chat_id = stoi(request.get("id", "0"));
+                    int chat_id = stoi(form.get("id", "0"));
+                    if (chat_id == 0)
+                    {
+                        send_not_found_exception("Missing `id` param", "/chat/message/get_all", response);
+                        return;                           
+                    }
                     std::vector<models::Message> result = models::Message::get_all_messages_by_chat_id(chat_id);
                     Poco::JSON::Array output;
 
@@ -182,7 +222,7 @@ class ChatHandler : public HTTPRequestHandler
             }
             catch (...) {}
 
-            send_not_fount_exception("Request receiver with path: " + path + "not found", "", response);
+            send_not_found_exception("Request receiver with path: " + path + " not found", "", response);
         }
     
     private:

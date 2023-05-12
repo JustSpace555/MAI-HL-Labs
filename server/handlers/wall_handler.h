@@ -63,13 +63,26 @@ class WallHandler : public HTTPRequestHandler
             response.setContentType("application/json");
             Poco::URI uri = Poco::URI(request.getURI());
             std::string path = uri.getPath();
-            std::cout << "Path of wall request: " + path << std::endl;
+            std::string method = request.getMethod();
+            std::istream& stream = request.stream();
+
+            std::ostringstream oss;
+            Poco::StreamCopier::copyStream(stream, oss);
+            std::string requestBody = oss.str();
+            std::cout << "Request body = " + requestBody << std::endl;
+
+            HTMLForm form(request, stream);
 
             try 
             {
-                if (path == "/wall" && request.getMethod() == HTTPRequest::HTTP_GET)
+                if (path == "/wall" && method == HTTPRequest::HTTP_GET)
                 {
-                    int user_id = stoi(request.get("id", "0"));
+                    int user_id = stoi(form.get("id", "0"));
+                    if (user_id == 0)
+                    {
+                        send_not_found_exception("Missing param id", "/wall", response);
+                        return;                        
+                    }
                     std::vector<models::Post> result = models::Post::get_all_posts_by_user_id(user_id);
                     Poco::JSON::Array output;
 
@@ -80,9 +93,14 @@ class WallHandler : public HTTPRequestHandler
                     return;
                 }
 
-                else if (path == "/wall/post" && request.getMethod() == HTTPRequest::HTTP_GET)
+                else if (path == "/wall/post" && method == HTTPRequest::HTTP_GET)
                 {
-                    int post_id = stoi(request.get("receiver_id", "0"));
+                    int post_id = stoi(form.get("id", "0"));
+                    if (post_id == 0)
+                    {
+                        send_not_found_exception("Missing param id", "/wall/post", response);
+                        return;                                                
+                    }
                     std::optional<models::Post> result = models::Post::get_post_by_id(post_id);
                     
                     if (result)
@@ -93,15 +111,20 @@ class WallHandler : public HTTPRequestHandler
                     }
                     else
                     {
-                        send_not_fount_exception("Post with id" + std::to_string(post_id) + "was not found", "/wall", response);
+                        send_not_found_exception("Post with id " + std::to_string(post_id) + " was not found", "/wall/post", response);
                     }
 
                     return;
                 }
 
-                else if (path == "/wall/post" && request.getMethod() == HTTPRequest::HTTP_POST)
+                else if (path == "/wall/post" && method == HTTPRequest::HTTP_POST)
                 {
-                    int user_id = stoi(request.get("user_id", "0"));
+                    int user_id = stoi(form.get("id", "0"));
+                    if (user_id == 0)
+                    {
+                        send_not_found_exception("Missing param id", "/wall/post", response);
+                        return;                                                
+                    }
                     std::string content = "";
                     std::string creation_date = "";
                     models::Post post;
@@ -109,7 +132,7 @@ class WallHandler : public HTTPRequestHandler
                     try
                     {
                         Poco::JSON::Parser parser;
-                        Poco::Dynamic::Var result = parser.parse(request.stream());
+                        Poco::Dynamic::Var result = parser.parse(requestBody);
                         Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
                         content = object->getValue<std::string>("content");
                         creation_date = object->getValue<std::string>("creation_date");
@@ -122,6 +145,7 @@ class WallHandler : public HTTPRequestHandler
                     post.set_user_id(user_id);
                     post.set_content(content);
                     post.set_creation_date(creation_date);
+                    post.save_to_db();
 
                     response.setStatus(Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK);
                     response.send() << post.get_post_id();
@@ -131,7 +155,7 @@ class WallHandler : public HTTPRequestHandler
             }
             catch (...) {}
 
-            send_not_fount_exception("Request receiver with path: " + path + " not found", "", response);
+            send_not_found_exception("Request receiver with path: " + path + " not found", "", response);
         }
 
     private:

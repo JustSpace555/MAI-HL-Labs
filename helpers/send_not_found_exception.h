@@ -5,7 +5,7 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include <Poco/JSON/Object.h>
 
-void send_not_fount_exception(std::string message, std::string instance, Poco::Net::HTTPServerResponse &response)
+void send_not_found_exception(std::string message, std::string instance, Poco::Net::HTTPServerResponse &response)
 {
     response.setStatus(Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
     Poco::JSON::Object::Ptr json = new Poco::JSON::Object();

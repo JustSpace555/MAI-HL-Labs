@@ -38,12 +38,12 @@ namespace models
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Database connection exception:" << e.what() << std::endl;
+            std::cout << "Database connection exception:" << e.message() << std::endl;
             throw;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
     }
@@ -67,7 +67,7 @@ namespace models
         Poco::Dynamic::Var result = parser.parse(json);
         Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
 
-        post.post_id = object->getValue<long>("post_id");
+        post.post_id = object->getValue<long>("id");
         post.user_id = object->getValue<long>("user_id");
         post.content = object->getValue<std::string>("content");
         post.creation_date = object->getValue<std::string>("creation_date");
@@ -82,7 +82,7 @@ namespace models
             Poco::Data::Session session = database::Database::get_instance().create_database_session();
             Poco::Data::Statement select(session);
             Post post;
-            select << "select post_id, user_id, content, creation_date from posts_table where id=?",
+            select << "select id, user_id, content, creation_date from posts_table where id=?",
                     into(post.post_id),
                     into(post.user_id),
                     into(post.content),
@@ -96,12 +96,12 @@ namespace models
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Database connection exception:" << e.what() << std::endl;
+            std::cout << "Database connection exception:" << e.message() << std::endl;
             throw;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
 
@@ -117,7 +117,7 @@ namespace models
             std::vector<Post> output_posts;
             Post post;
 
-            select << "select post_id, user_id, content, creation_date from posts_table where user_id=?",
+            select << "select id, user_id, content, creation_date from posts_table where user_id=?",
                     into(post.post_id),
                     into(post.user_id),
                     into(post.content),
@@ -134,12 +134,12 @@ namespace models
         }
         catch(Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Connection exception:" << e.what() << std::endl;
+            std::cout << "Connection exception:" << e.message() << std::endl;
             throw;
         }
         catch(Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
         
@@ -175,12 +175,12 @@ namespace models
         }
         catch(Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Connection exception:" << e.what() << std::endl;
+            std::cout << "Connection exception:" << e.message() << std::endl;
             throw;
         }
         catch(Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
     }

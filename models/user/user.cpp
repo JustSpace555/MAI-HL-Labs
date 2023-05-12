@@ -43,12 +43,12 @@ namespace models
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Database connection exception:" << e.what() << std::endl;
+            std::cout << "Database connection exception:" << e.message() << std::endl;
             throw;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
     }
@@ -95,7 +95,7 @@ namespace models
             Poco::Data::Session session = database::Database::get_instance().create_database_session();
             Poco::Data::Statement select(session);
             User output;
-            select << "select id, first_name, last_name, user_login, user_password, email, phone_number, birth_date from users_table where id=?",
+            select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_id=?",
                 into(output.user_id),
                 into(output.user_first_name),
                 into(output.user_last_name),
@@ -113,12 +113,12 @@ namespace models
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Database connection exception:" << e.what() << std::endl;
+            std::cout << "Database connection exception:" << e.message() << std::endl;
             throw;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
         return {};
@@ -131,7 +131,7 @@ namespace models
             Poco::Data::Session session = database::Database::get_instance().create_database_session();
             Poco::Data::Statement select(session);
             User output;
-            select << "select id, first_name, last_name, user_login, user_password, email, phone_number, birth_date from users_table where login=? and user_password=?",
+            select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_login=? and user_password=?",
                 into(output.user_id),
                 into(output.user_first_name),
                 into(output.user_last_name),
@@ -150,12 +150,12 @@ namespace models
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Database connection exception:" << e.what() << std::endl;
+            std::cout << "Database connection exception:" << e.message() << std::endl;
             throw;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
         return {};
@@ -168,7 +168,7 @@ namespace models
             Poco::Data::Session session = database::Database::get_instance().create_database_session();
             Poco::Data::Statement select(session);
             User output;
-            select << "select id, first_name, last_name, user_login, user_password, email, phone_number, birth_date from users_table where email=? and user_password=?",
+            select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_email=? and user_password=?",
                 into(output.user_id),
                 into(output.user_first_name),
                 into(output.user_last_name),
@@ -187,12 +187,12 @@ namespace models
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Database connection exception:" << e.what() << std::endl;
+            std::cout << "Database connection exception:" << e.message() << std::endl;
             throw;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
         return {};
@@ -205,7 +205,7 @@ namespace models
             Poco::Data::Session session = database::Database::get_instance().create_database_session();
             Poco::Data::Statement select(session);
             User output;
-            select << "select id, first_name, last_name, user_login, user_password, email, phone_number, birth_date from users_table where phone_number=? and user_password=?",
+            select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_phone_number=? and user_password=?",
                 into(output.user_id),
                 into(output.user_first_name),
                 into(output.user_last_name),
@@ -224,12 +224,12 @@ namespace models
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Database connection exception:" << e.what() << std::endl;
+            std::cout << "Database connection exception:" << e.message() << std::endl;
             throw;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
         return {};
@@ -243,7 +243,7 @@ namespace models
             Statement select(session);
             User user;
             login += "%";
-            select << "select id, first_name, last_name, user_login, user_password, email, phone_number, birth_date from users_table where user_login like ?",
+            select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_login like ?",
                     into(user.user_id),
                     into(user.user_first_name),
                     into(user.user_last_name),
@@ -261,12 +261,12 @@ namespace models
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Database connection exception:" << e.what() << std::endl;
+            std::cout << "Database connection exception:" << e.message() << std::endl;
             throw;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
         return {};
@@ -279,7 +279,7 @@ namespace models
             Poco::Data::Session session = database::Database::get_instance().create_database_session();
             Statement select(session);
             User user;
-            select << "select id, first_name, last_name, user_login, user_password, email, phone_number, birth_date from users_table where email like ?",
+            select << "select user_id, user_first_name, user_last_name, user_user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_email like ?",
                     into(user.user_id),
                     into(user.user_first_name),
                     into(user.user_last_name),
@@ -297,12 +297,12 @@ namespace models
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Database connection exception:" << e.what() << std::endl;
+            std::cout << "Database connection exception:" << e.message() << std::endl;
             throw;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
         return {};
@@ -318,7 +318,7 @@ namespace models
 
             Poco::Data::Session session = database::Database::get_instance().create_database_session();
             Statement select(session);
-            select << "select id, first_name, last_name, user_login, user_password, email, phone_number, birth_date from users_table where first_name like ? and last_name like ?",
+            select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_first_name like ? and user_last_name like ?",
                     use(first_name),
                     use(last_name),
                     range(0, 1);
@@ -344,12 +344,12 @@ namespace models
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Database connection exception:" << e.what() << std::endl;
+            std::cout << "Database connection exception:" << e.message() << std::endl;
             throw;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
         return {};
@@ -362,7 +362,7 @@ namespace models
             Poco::Data::Session session = database::Database::get_instance().create_database_session();
             Statement select(session);
             User user;
-            select << "select id, first_name, last_name, user_login, user_password, email, phone_number, birth_date from users_table where phone_number like ?",
+            select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_phone_number like ?",
                     into(user.user_id),
                     into(user.user_first_name),
                     into(user.user_last_name),
@@ -380,12 +380,12 @@ namespace models
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Database connection exception:" << e.what() << std::endl;
+            std::cout << "Database connection exception:" << e.message() << std::endl;
             throw;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
         return {};
@@ -398,7 +398,7 @@ namespace models
             Poco::Data::Session session = database::Database::get_instance().create_database_session();
             Poco::Data::Statement insert(session);
 
-            insert << "insert into users_table (first_name, last_name, login, password, email, phone_number, birth_date) values(?, ?, ?, ?, ?, ?, ?)",
+            insert << "insert into users_table (user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date) values(?, ?, ?, ?, ?, ?, ?)",
                 use(user_first_name),
                 use(user_last_name),
                 use(user_login),
@@ -422,12 +422,12 @@ namespace models
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "Database connection exception:" << e.what() << std::endl;
+            std::cout << "Database connection exception:" << e.message() << std::endl;
             throw;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-            std::cout << "Database statement exception:" << e.what() << std::endl;
+            std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
     }

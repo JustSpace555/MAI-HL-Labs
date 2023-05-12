@@ -21,6 +21,7 @@
 #include "Poco/Util/HelpFormatter.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/URI.h"
+#include "Poco/StreamCopier.h"
 #include <iostream>
 #include <iostream>
 #include <fstream>
@@ -61,15 +62,30 @@ class UserHandler : public HTTPRequestHandler
         {
             response.setChunkedTransferEncoding(true);
             response.setContentType("application/json");
+
             Poco::URI uri = Poco::URI(request.getURI());
             std::string path = uri.getPath();
-            std::cout << "Path of user request: " + path << std::endl;
+            std::string method = request.getMethod();
+            std::istream& stream = request.stream();
+
+            std::ostringstream oss;
+            Poco::StreamCopier::copyStream(stream, oss);
+            std::string requestBody = oss.str();
+            std::cout << "Request body = " + requestBody << std::endl;
+
+            HTMLForm form(request, stream);
 
             try 
             {
-                if (path == "/user" && request.getMethod() == HTTPRequest::HTTP_GET)
+                if (path == "/user" && method == HTTPRequest::HTTP_GET)
                 {
-                    int user_id = stoi(request.get("id", "0"));
+                    int user_id = stoi(form.get("id", "0"));
+                    if (user_id == 0)
+                    {
+                        send_not_found_exception("Missing param id", "/user", response);
+                        return;
+                    }
+
                     std::optional<models::User> result = models::User::get_by_id(user_id);
 
                     if (result)
@@ -80,13 +96,13 @@ class UserHandler : public HTTPRequestHandler
                     }
                     else
                     {
-                        send_not_fount_exception("User with id" + std::to_string(user_id) + "was not found", "/wall", response);
+                        send_not_found_exception("User with id = " + std::to_string(user_id) + " was not found", "/user", response);
                     }
 
                     return;
                 }
 
-                else if (path == "/user" && request.getMethod() == HTTPRequest::HTTP_POST)
+                else if (path == "/user" && method == HTTPRequest::HTTP_POST)
                 {
                     models::User user;
                     std::string first_name = "";
@@ -100,7 +116,7 @@ class UserHandler : public HTTPRequestHandler
                     try
                     {
                         Poco::JSON::Parser parser;
-                        Poco::Dynamic::Var result = parser.parse(request.stream());
+                        Poco::Dynamic::Var result = parser.parse(requestBody);
                         Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
                         first_name = object->getValue<std::string>("first_name");
                         last_name = object->getValue<std::string>("last_name");
@@ -113,6 +129,7 @@ class UserHandler : public HTTPRequestHandler
                     } catch (std::exception &e) {
                         std::cout << "Error parsing request body: " << e.what() << std::endl;
                         response.setStatus(HTTPResponse::HTTP_BAD_REQUEST);
+                        response.send();
                         return;
                     }
 
@@ -128,13 +145,30 @@ class UserHandler : public HTTPRequestHandler
 
                     response.setStatus(Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK);
                     response.send() << user.get_id();
+                    return;
                 }
 
-                else if (path == "/user/auth" && request.getMethod() == HTTPRequest::HTTP_GET)
+                else if (path == "/user/auth" && method == HTTPRequest::HTTP_GET)
                 {
-                    std::string by = request.get("by", "");
-                    std::string param = request.get("param", "");
-                    std::string password = request.get("password", "");
+                    std::string by = form.get("by", "");
+                    std::string param = form.get("param", "");
+                    std::string password = form.get("password", "");
+
+                    if (by.empty())
+                    {
+                        send_not_found_exception("Missing `by` param", "/user/auth", response);
+                        return;
+                    }
+                    else if (param.empty())
+                    {
+                        send_not_found_exception("Missing `param`", "/user/auth", response);
+                        return;
+                    }
+                    else if (password.empty())
+                    {
+                        send_not_found_exception("Missing `password` param", "user/auth", response);
+                        return;
+                    }
 
                     std::optional<models::User> result;
                     if (by == "login")
@@ -170,76 +204,81 @@ class UserHandler : public HTTPRequestHandler
                     }
                     else
                     {
-                        send_not_fount_exception("User with " + by + " = " + param + "was not found", "/user", response);
+                        send_not_found_exception("User with " + by + " = " + param + "was not found", "/user", response);
                     }
+
+                    return;
                 }
 
-                else if (path == "/user/find" && request.getMethod() == HTTPRequest::HTTP_POST)
+                else if (path == "/user/find" && method == HTTPRequest::HTTP_POST)
                 {
-                    std::string by = request.get("by", "");
-                    std::string param = request.get("param", "");
+                    std::string by = form.get("by", "");
 
-                    std::optional<models::User> result;
+                    if (by.empty())
+                    {
+                        send_not_found_exception("Missing `by` param", "/user/auth", response);
+                        return;
+                    }
+
+                    Poco::JSON::Object::Ptr object;
+                    try
+                    {
+                        Poco::JSON::Parser parser;
+                        Poco::Dynamic::Var result = parser.parse(requestBody);
+                        object = result.extract<Poco::JSON::Object::Ptr>();                        
+                    }
+                    catch (std::exception &e)
+                    {
+                        std::cout << "Error parsing request body: " << e.what() << std::endl;
+                        response.setStatus(HTTPResponse::HTTP_BAD_REQUEST);
+                        response.send();
+                        return;
+                    }
+
+                    std::vector<models::User> result;
                     if (by == "login")
                     {
-                        try
+                        Poco::Nullable<std::string> login = object->getNullableValue<std::string>("login");
+                        if (login.isNull())
                         {
-                            Poco::JSON::Parser parser;
-                            Poco::Dynamic::Var result = parser.parse(request.stream());
-                            Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
-                            std::string login = object->getValue<std::string>("login");
-                            result = models::User::find_by_login(login);
-                        } catch (std::exception &e) {
-                            std::cout << "Error parsing request body: " << e.what() << std::endl;
-                            response.setStatus(HTTPResponse::HTTP_BAD_REQUEST);
+                            send_not_found_exception("Missing `login` param", "/user/auth", response);
                             return;
                         }
+                        std::optional<models::User> user = models::User::find_by_login(login.value());
+                        if (user.has_value()) result.push_back(user.value());
                     }
                     else if (by == "email")
                     {
-                        try
+                        Poco::Nullable<std::string> email = object->getNullableValue<std::string>("email");
+                        if (email.isNull())
                         {
-                            Poco::JSON::Parser parser;
-                            Poco::Dynamic::Var result = parser.parse(request.stream());
-                            Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
-                            std::string email = object->getValue<std::string>("email");
-                            result = models::User::find_by_email(email);
-                        } catch (std::exception &e) {
-                            std::cout << "Error parsing request body: " << e.what() << std::endl;
-                            response.setStatus(HTTPResponse::HTTP_BAD_REQUEST);
+                            send_not_found_exception("Missing `login` param", "/user/auth", response);
                             return;
                         }
+                        std::optional<models::User> user = models::User::find_by_email(email.value());
+                        if (user.has_value()) result.push_back(user.value());
                     }
                     else if (by == "phone_number")
                     {
-                        try
+                        Poco::Nullable<std::string> phone_number = object->getNullableValue<std::string>("phone_number");
+                        if (phone_number.isNull())
                         {
-                            Poco::JSON::Parser parser;
-                            Poco::Dynamic::Var result = parser.parse(request.stream());
-                            Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
-                            std::string phone_number = object->getValue<std::string>("phone_number");
-                            result = models::User::find_by_phone_number(phone_number);
-                        } catch (std::exception &e) {
-                            std::cout << "Error parsing request body: " << e.what() << std::endl;
-                            response.setStatus(HTTPResponse::HTTP_BAD_REQUEST);
+                            send_not_found_exception("Missing `login` param", "/user/auth", response);
                             return;
                         }
+                        std::optional<models::User> user = models::User::find_by_phone_number(phone_number.value());
+                        if (user.has_value()) result.push_back(user.value());
                     }
                     else if (by == "name")
                     {
-                        try
+                        Poco::Nullable<std::string> first_name = object->getNullableValue<std::string>("first_name"); 
+                        Poco::Nullable<std::string> last_name = object->getNullableValue<std::string>("last_name");
+                        if (first_name.isNull() || last_name.isNull())
                         {
-                            Poco::JSON::Parser parser;
-                            Poco::Dynamic::Var result = parser.parse(request.stream());
-                            Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
-                            std::string first_name = object->getValue<std::string>("first_name");
-                            std::string last_name = object->getValue<std::string>("last_name");
-                            result = models::User::find_by_first_last_name(first_name, last_name);
-                        } catch (std::exception &e) {
-                            std::cout << "Error parsing request body: " << e.what() << std::endl;
-                            response.setStatus(HTTPResponse::HTTP_BAD_REQUEST);
+                            send_not_found_exception("Missing `first_name` or `last_name` param", "/user/auth", response);
                             return;
                         }
+                        result = models::User::find_by_first_last_name(first_name, last_name);
                     }
                     else
                     {
@@ -254,21 +293,30 @@ class UserHandler : public HTTPRequestHandler
                         return;
                     }
 
-                    if (result)
+                    if (!result.empty())
                     {
+                        Poco::JSON::Array output;
+                        for (models::User user : result)
+                            output.add(user.to_json());
+
                         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
                         std::ostream &ostr = response.send();
-                        Poco::JSON::Stringifier::stringify(result->to_json(), ostr);
+                        Poco::JSON::Stringifier::stringify(output, ostr);
                     }
                     else
                     {
-                        send_not_fount_exception("User with " + by + " = " + param + "was not found", "/user", response);
+                        send_not_found_exception("User was not found", "/user", response);
                     }
+                    return;
                 }
             }
-            catch (...) {}
+            catch (const std::exception &e)
+            {
+                std::string what = e.what();
+                std::cout << "Exception: " + what << std::endl;
+            }
 
-            send_not_fount_exception("Request receiver with path: " + path + " not found", "user", response);
+            send_not_found_exception("Request receiver with path: " + path + " not found", "user", response);
         }
 
     private:
