@@ -37,4 +37,20 @@ namespace database
     {
         return Poco::Data::Session(pool->get());
     }
+
+    std::vector<std::string> Database::get_all_shardings()
+    {
+        std::vector<std::string> output;
+        std::string shard = "-- sharding:";
+        for (int i = 0; i <= MAX_SHARDINGS; i++)
+            output.push_back(shard + std::to_string(i));
+        return output;
+    }
+
+    std::string Database::get_sharding(long id)
+    {
+        std::string key = std::to_string(id);
+        int shard_number = std::hash<std::string>{}(key) % MAX_SHARDINGS;
+        return "-- sharding:" + std::to_string(shard_number);
+    }
 }

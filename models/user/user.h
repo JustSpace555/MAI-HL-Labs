@@ -33,6 +33,9 @@ namespace models
             static std::vector<User> find_by_first_last_name(std::string &first_name, std::string &last_name);
             static std::optional<User> find_by_phone_number(std::string &phone_number);
 
+            static long table_size();
+            static std::vector<User> get_users_from_table_request(std::string where_request);
+
             Poco::JSON::Object::Ptr to_json() const;
             void save_to_db();
 
@@ -45,6 +48,7 @@ namespace models
             std::string get_phone_number() const;
             std::string get_birth_date() const;
 
+            void set_user_id(long id);
             void set_first_name(std::string f_n);
             void set_last_name(std::string l_n);
             void set_login(std::string log);

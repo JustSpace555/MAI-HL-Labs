@@ -26,7 +26,10 @@ namespace models
         {
 
             Poco::Data::Session db_session = database::Database::get_instance().create_database_session();
-            Statement create_stmt(db_session);
+            std::vector<std::string> shardings = database::Database::get_all_shardings();
+            for (std::string& shard : shardings)
+            {
+                Statement create_stmt(db_session);
                 create_stmt << "create table if not exists `users_table`"
                             << "("
                             << "`user_id` int not null auto_increment,"
@@ -38,8 +41,10 @@ namespace models
                             << "`user_phone_number` varchar(11),"
                             << "`user_birth_date` varchar(10) null,"
                             << "primary key (`user_id`), key `user_first_name_index` (`user_first_name`), key `user_last_name_index` (`user_last_name`)"
-                            << ");",
+                            << ");"
+                            << shard,
                             now;
+            }
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
@@ -95,7 +100,8 @@ namespace models
             Poco::Data::Session session = database::Database::get_instance().create_database_session();
             Poco::Data::Statement select(session);
             User output;
-            select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_id=?",
+            std::string shard = database::Database::get_sharding(id);
+            select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_id=?" + shard,
                 into(output.user_id),
                 into(output.user_first_name),
                 into(output.user_last_name),
@@ -128,25 +134,8 @@ namespace models
     {
         try
         {
-            Poco::Data::Session session = database::Database::get_instance().create_database_session();
-            Poco::Data::Statement select(session);
-            User output;
-            select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_login=? and user_password=?",
-                into(output.user_id),
-                into(output.user_first_name),
-                into(output.user_last_name),
-                into(output.user_login),
-                into(output.user_password),
-                into(output.user_email),
-                into(output.user_phone_number),
-                into(output.user_birth_date),
-                use(login),
-                use(password),
-                range(0, 1);
-
-            select.execute();
-            Poco::Data::RecordSet rs(select);
-            if (rs.moveFirst()) return output;
+            std::vector<User> result = User::get_users_from_table_request("user_login=\'" + login + "\' and user_password=\'" + password + "\'");
+            if (!result.empty()) return result[0];
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
@@ -165,25 +154,8 @@ namespace models
     {
         try
         {
-            Poco::Data::Session session = database::Database::get_instance().create_database_session();
-            Poco::Data::Statement select(session);
-            User output;
-            select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_email=? and user_password=?",
-                into(output.user_id),
-                into(output.user_first_name),
-                into(output.user_last_name),
-                into(output.user_login),
-                into(output.user_password),
-                into(output.user_email),
-                into(output.user_phone_number),
-                into(output.user_birth_date),
-                use(email),
-                use(password),
-                range(0, 1);
-
-            select.execute();
-            Poco::Data::RecordSet rs(select);
-            if (rs.moveFirst()) return output;
+            std::vector<User> result = User::get_users_from_table_request("user_email=\'" + email + "\' and user_password=\'" + password + "\'");
+            if (!result.empty()) return result[0];
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
@@ -202,25 +174,8 @@ namespace models
     {
         try
         {
-            Poco::Data::Session session = database::Database::get_instance().create_database_session();
-            Poco::Data::Statement select(session);
-            User output;
-            select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_phone_number=? and user_password=?",
-                into(output.user_id),
-                into(output.user_first_name),
-                into(output.user_last_name),
-                into(output.user_login),
-                into(output.user_password),
-                into(output.user_email),
-                into(output.user_phone_number),
-                into(output.user_birth_date),
-                use(phone_number),
-                use(password),
-                range(0, 1);
-
-            select.execute();
-            Poco::Data::RecordSet rs(select);
-            if (rs.moveFirst()) return output;
+            std::vector<User> result = User::get_users_from_table_request("user_phone_number=\'" + phone_number + "\' and user_password=\'" + password + "\'");
+            if (!result.empty()) return result[0];
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
@@ -239,25 +194,8 @@ namespace models
     {
         try
         {
-            Poco::Data::Session session = database::Database::get_instance().create_database_session();
-            Statement select(session);
-            User user;
-            login += "%";
-            select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_login like ?",
-                    into(user.user_id),
-                    into(user.user_first_name),
-                    into(user.user_last_name),
-                    into(user.user_login),
-                    into(user.user_password),
-                    into(user.user_email),
-                    into(user.user_phone_number),
-                    into(user.user_birth_date),
-                    use(login),
-                    range(0, 1); //  iterate over result set one row at a time
-
-            select.execute();
-            Poco::Data::RecordSet rs(select);
-            if (rs.moveFirst()) return user;
+            std::vector<User> result = User::get_users_from_table_request("user_login like \'" + login + "\'");
+            if (!result.empty()) return result[0];
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
@@ -276,24 +214,8 @@ namespace models
     {
         try
         {
-            Poco::Data::Session session = database::Database::get_instance().create_database_session();
-            Statement select(session);
-            User user;
-            select << "select user_id, user_first_name, user_last_name, user_user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_email like ?",
-                    into(user.user_id),
-                    into(user.user_first_name),
-                    into(user.user_last_name),
-                    into(user.user_login),
-                    into(user.user_password),
-                    into(user.user_email),
-                    into(user.user_phone_number),
-                    into(user.user_birth_date),
-                    use(email),
-                    range(0, 1); //  iterate over result set one row at a time
-            
-            select.execute();
-            Poco::Data::RecordSet rs(select);
-            if (rs.moveFirst()) return user;
+            std::vector<User> result = User::get_users_from_table_request("user_email like \'" + email + "\'");
+            if (!result.empty()) return result[0];
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
@@ -312,34 +234,7 @@ namespace models
     {
         try
         {
-            std::vector<User> result;
-            first_name += "%";
-            last_name += "%";
-
-            Poco::Data::Session session = database::Database::get_instance().create_database_session();
-            Statement select(session);
-            select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_first_name like ? and user_last_name like ?",
-                    use(first_name),
-                    use(last_name),
-                    range(0, 1);
-
-            select.execute();
-            Poco::Data::RecordSet rs(select);
-            bool more = rs.moveFirst();
-            while (more)
-            {
-                User user;
-                user.user_id = rs[0].convert<long>();
-                user.user_first_name = rs[1].convert<std::string>();
-                user.user_last_name = rs[2].convert<std::string>();
-                user.user_login = rs[3].convert<std::string>();
-                user.user_password = rs[4].convert<std::string>();
-                user.user_email = rs[5].convert<std::string>();
-                user.user_phone_number = rs[6].convert<std::string>();
-                user.user_birth_date = rs[7].convert<std::string>();
-                result.push_back(user);
-                more = rs.moveNext();
-            }
+            std::vector<User> result = User::get_users_from_table_request("user_first_name like \'" + first_name + "\' and user_last_name like \'" + last_name + "\'");
             return result;
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
@@ -359,24 +254,8 @@ namespace models
     {
         try
         {
-            Poco::Data::Session session = database::Database::get_instance().create_database_session();
-            Statement select(session);
-            User user;
-            select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where user_phone_number like ?",
-                    into(user.user_id),
-                    into(user.user_first_name),
-                    into(user.user_last_name),
-                    into(user.user_login),
-                    into(user.user_password),
-                    into(user.user_email),
-                    into(user.user_phone_number),
-                    into(user.user_birth_date),
-                    use(phone_number),
-                    range(0, 1); //  iterate over result set one row at a time
-            
-            select.execute();
-            Poco::Data::RecordSet rs(select);
-            if (rs.moveFirst()) return user;
+            std::vector<User> result = User::get_users_from_table_request("user_phone_number like \'" + phone_number + "\'");
+            if (!result.empty()) return result[0];
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
@@ -397,8 +276,11 @@ namespace models
         {
             Poco::Data::Session session = database::Database::get_instance().create_database_session();
             Poco::Data::Statement insert(session);
+            long table_size = User::table_size();
+            table_size++;
+            std::string shard = database::Database::get_sharding(table_size);
 
-            insert << "insert into users_table (user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date) values(?, ?, ?, ?, ?, ?, ?)",
+            insert << "insert into users_table (user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date) values(?, ?, ?, ?, ?, ?, ?)" + shard,
                 use(user_first_name),
                 use(user_last_name),
                 use(user_login),
@@ -410,7 +292,7 @@ namespace models
             insert.execute();
 
             Poco::Data::Statement select(session);
-            select << "select last_insert_id()",
+            select << "select last_insert_id()" + shard,
                 into(user_id),
                 range(0, 1); //  iterate over result set one row at a time
 
@@ -430,6 +312,85 @@ namespace models
             std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
+    }
+
+    long User::table_size()
+    {
+        long result = 0;
+        std::vector<std::string> shardings = database::Database::get_all_shardings();
+        for (const std::string& shard : shardings)
+        {
+
+            Poco::Data::Session session = database::Database::get_instance().create_database_session();
+            Poco::Data::Statement select(session);
+            long temp;
+            std::string select_str = "select count(*) from users_table";
+            select_str += shard;
+            select << select_str,
+                into(temp),
+                range(0, 1);
+
+            select.execute();
+            Poco::Data::RecordSet rs(select);
+
+            if (rs.moveFirst()) result += temp;
+        }
+        return result;
+    }
+
+    std::vector<User> User::get_users_from_table_request(std::string where_request)
+    {
+        std::vector<User> result;
+        std::vector<std::string> shardings = database::Database::get_all_shardings();
+        std::vector<std::future<std::vector<User>>> futures;
+
+        for (const std::string& shard : shardings)
+        {
+            auto handle = std::async(
+                std::launch::async,
+                [where_request, shard]() mutable -> std::vector<User>
+                {
+                    std::vector<User> result;
+                    Poco::Data::Session session = database::Database::get_instance().create_database_session();
+                    Poco::Data::Statement select(session);
+                    select << "select user_id, user_first_name, user_last_name, user_login, user_password, user_email, user_phone_number, user_birth_date from users_table where " + where_request + shard,
+                    range(0, 1);
+
+                    select.execute();
+                    Poco::Data::RecordSet rs(select);
+
+                    bool are_more = rs.moveFirst();
+                    while(are_more)
+                    {
+                        User user;
+                        user.set_user_id(rs[0].convert<long>());
+                        user.set_first_name(rs[1].convert<std::string>());
+                        user.set_last_name(rs[2].convert<std::string>());
+                        user.set_login(rs[3].convert<std::string>());
+                        user.set_password(rs[4].convert<std::string>());
+                        user.set_email(rs[5].convert<std::string>());
+                        user.set_phone_number(rs[6].convert<std::string>());
+                        user.set_birth_day(rs[7].convert<std::string>());
+                        result.push_back(user);
+                        are_more = rs.moveNext();
+                    }
+                    return result;
+                }
+            );
+            futures.emplace_back(std::move(handle));
+        }
+
+        for (std::future<std::vector<User>>& res: futures)
+        {
+            std::vector<User> vector = res.get();
+            std::copy
+            (
+                std::begin(vector),
+                std::end(vector),
+                std::back_inserter(result)
+            );
+        }
+        return result;
     }
 
     long User::get_id() const
@@ -470,6 +431,11 @@ namespace models
     std::string User::get_birth_date() const
     {
         return user_birth_date;
+    }
+
+    void User::set_user_id(long id)
+    {
+        user_id = id;
     }
 
     void User::set_first_name(std::string f_n)

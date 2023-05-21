@@ -3,6 +3,7 @@
 
 #include <string>
 #include <Poco/Data/SessionPool.h>
+#include <vector>
 
 namespace database
 {
@@ -14,7 +15,10 @@ namespace database
             Database();
 
         public:
+            static const int MAX_SHARDINGS = 2;
             static Database &get_instance();
+            static std::vector<std::string> get_all_shardings();
+            static std::string get_sharding(long id);
 
             Poco::Data::Session create_database_session();
 
