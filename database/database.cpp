@@ -20,7 +20,7 @@ namespace database
         connection += config.get_password();
 
         connection += ";db=";
-        connection += config.get_database_path();
+        connection += config.get_database_name();
 
         std::cout << "Database connection parameters:" << connection << std::endl;
 

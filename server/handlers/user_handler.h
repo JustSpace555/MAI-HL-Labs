@@ -80,16 +80,23 @@ class UserHandler : public HTTPRequestHandler
                 if (path == "/user" && method == HTTPRequest::HTTP_GET)
                 {
                     int user_id = stoi(form.get("id", "0"));
+                    bool apply_cache = request.get("Cache-Control", "no-cache") == "cache";
+
                     if (user_id == 0)
                     {
                         send_not_found_exception("Missing param id", "/user", response);
                         return;
                     }
 
-                    std::optional<models::User> result = models::User::get_by_id(user_id);
+                    std::optional<models::User> result;
+                    if (apply_cache)
+                        result = models::User::from_cache(user_id);
+                    else
+                        result = models::User::get_by_id(user_id);
 
                     if (result)
                     {
+                        if (apply_cache) result->save_to_cache();
                         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
                         std::ostream &ostr = response.send();
                         Poco::JSON::Stringifier::stringify(result->to_json(), ostr);
@@ -142,6 +149,7 @@ class UserHandler : public HTTPRequestHandler
                     if (!birth_day.isNull()) user.set_birth_day(birth_day.value());
 
                     user.save_to_db();
+                    user.save_to_cache();
 
                     response.setStatus(Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK);
                     response.send() << user.get_id();

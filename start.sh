@@ -1,5 +1,0 @@
-export DATABASE_HOST=127.0.0.1
-export DATABASE_PORT=6032
-export DATABASE_LOGIN=stud
-export DATABASE_PASSWORD=stud
-export DATABASE_DATABASE=archdb

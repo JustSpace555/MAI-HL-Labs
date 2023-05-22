@@ -29,6 +29,7 @@ SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(${service} main.cpp
+        cache/cache.cpp
         config/config.cpp
         database/database.cpp
         models/chat/chat.cpp
@@ -36,12 +37,29 @@ add_executable(${service} main.cpp
         models/post/post.cpp
         models/user/user.cpp)
 
+add_executable(create_mock_data tests/create_mock_data.cpp)
+
 target_include_directories(${service} PRIVATE "${CMAKE_BINARY_DIR}")
 target_compile_options(${service} PRIVATE -Wall -Wextra -pedantic -Werror )
 set_target_properties(${service} PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(${service} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
 
 target_link_libraries(${service} PRIVATE
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${Poco_LIBRARIES}
+        "PocoData"
+        "PocoDataMySQL"
+        "mysqlclient"
+        ZLIB::ZLIB)
+
+
+
+target_include_directories(create_mock_data PRIVATE "${CMAKE_BINARY_DIR}")
+target_compile_options(create_mock_data PRIVATE -Wall -Wextra -pedantic -Werror )
+set_target_properties(create_mock_data PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(create_mock_data PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
+        
+target_link_libraries(create_mock_data PRIVATE
         ${CMAKE_THREAD_LIBS_INIT}
         ${Poco_LIBRARIES}
         "PocoData"

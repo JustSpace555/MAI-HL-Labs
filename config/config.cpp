@@ -8,7 +8,8 @@ Config::Config()
     port = std::getenv("DATABASE_PORT");
     login = std::getenv("DATABASE_LOGIN");
     password = std::getenv("DATABASE_PASSWORD");
-    database_path = std::getenv("DATABASE_DATABASE");
+    database_name = std::getenv("DATABASE_DATABASE");
+    cache_server = std::getenv("CACHE");
 }
 
 Config &Config::get_instanse()
@@ -37,7 +38,12 @@ const std::string &Config::get_password()
     return password;
 }
 
-const std::string &Config::get_database_path()
+const std::string &Config::get_database_name()
 {
-    return database_path;
+    return database_name;
+}
+
+const std::string &Config::get_cache_server()
+{
+    return cache_server;
 }

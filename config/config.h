@@ -15,7 +15,8 @@ class Config
         std::string port;
         std::string login;
         std::string password;
-        std::string database_path;
+        std::string database_name;
+        std::string cache_server;
 
     public:
         static Config &get_instanse();
@@ -24,7 +25,8 @@ class Config
         const std::string &get_host();
         const std::string &get_login();
         const std::string &get_password();
-        const std::string &get_database_path();
+        const std::string &get_database_name();
+        const std::string &get_cache_server();
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include "user.h"
 #include "../../database/database.h"
 #include "../../config/config.h"
+#include "../../cache/cache.h"
 
 #include <Poco/Data/MySQL/Connector.h>
 #include <Poco/Data/MySQL/MySQLException.h>
@@ -91,6 +92,23 @@ namespace models
         object->set("user_birth_date", user_birth_date);
 
         return object;
+    }
+
+    std::optional<User> User::from_cache(long id)
+    {
+        try
+        {
+            std::string result;
+            database::Cache cache = database::Cache::get_instance();
+
+            if (cache.get(id, result)) return User::from_json(result);
+        }
+        catch (std::exception& e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+
+        return {};
     }
 
     std::optional<User> User::get_by_id(long id)
@@ -312,6 +330,14 @@ namespace models
             std::cout << "Database statement exception:" << e.message() << std::endl;
             throw;
         }
+    }
+
+    void User::save_to_cache()
+    {
+        std::stringstream stream;
+        Poco::JSON::Stringifier::stringify(to_json(), stream);
+        std::string json = stream.str();
+        database::Cache::get_instance().put(user_id, json);
     }
 
     long User::table_size()

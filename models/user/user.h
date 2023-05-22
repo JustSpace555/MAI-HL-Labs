@@ -23,6 +23,7 @@ namespace models
         public:
             static void init();
             static User from_json(const std::string &json);
+            static std::optional<User> from_cache(long id);
 
             static std::optional<User> get_by_id(long id);
             static std::optional<User> auth_by_login(std::string &login, std::string &password);
@@ -38,6 +39,7 @@ namespace models
 
             Poco::JSON::Object::Ptr to_json() const;
             void save_to_db();
+            void save_to_cache();
 
             long get_id() const;
             std::string get_first_name() const;

@@ -129,6 +129,43 @@ social_network/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/build
 .PHONY : social_network/fast
 
+#=============================================================================
+# Target rules for targets named create_mock_data
+
+# Build rule for target.
+create_mock_data: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 create_mock_data
+.PHONY : create_mock_data
+
+# fast build rule for target.
+create_mock_data/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/create_mock_data.dir/build.make CMakeFiles/create_mock_data.dir/build
+.PHONY : create_mock_data/fast
+
+cache/cache.o: cache/cache.cpp.o
+.PHONY : cache/cache.o
+
+# target to build an object file
+cache/cache.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/cache/cache.cpp.o
+.PHONY : cache/cache.cpp.o
+
+cache/cache.i: cache/cache.cpp.i
+.PHONY : cache/cache.i
+
+# target to preprocess a source file
+cache/cache.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/cache/cache.cpp.i
+.PHONY : cache/cache.cpp.i
+
+cache/cache.s: cache/cache.cpp.s
+.PHONY : cache/cache.s
+
+# target to generate assembly for a file
+cache/cache.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/cache/cache.cpp.s
+.PHONY : cache/cache.cpp.s
+
 config/config.o: config/config.cpp.o
 .PHONY : config/config.o
 
@@ -297,6 +334,30 @@ models/user/user.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/models/user/user.cpp.s
 .PHONY : models/user/user.cpp.s
 
+tests/create_mock_data.o: tests/create_mock_data.cpp.o
+.PHONY : tests/create_mock_data.o
+
+# target to build an object file
+tests/create_mock_data.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/create_mock_data.dir/build.make CMakeFiles/create_mock_data.dir/tests/create_mock_data.cpp.o
+.PHONY : tests/create_mock_data.cpp.o
+
+tests/create_mock_data.i: tests/create_mock_data.cpp.i
+.PHONY : tests/create_mock_data.i
+
+# target to preprocess a source file
+tests/create_mock_data.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/create_mock_data.dir/build.make CMakeFiles/create_mock_data.dir/tests/create_mock_data.cpp.i
+.PHONY : tests/create_mock_data.cpp.i
+
+tests/create_mock_data.s: tests/create_mock_data.cpp.s
+.PHONY : tests/create_mock_data.s
+
+# target to generate assembly for a file
+tests/create_mock_data.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/create_mock_data.dir/build.make CMakeFiles/create_mock_data.dir/tests/create_mock_data.cpp.s
+.PHONY : tests/create_mock_data.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -305,7 +366,11 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... create_mock_data"
 	@echo "... social_network"
+	@echo "... cache/cache.o"
+	@echo "... cache/cache.i"
+	@echo "... cache/cache.s"
 	@echo "... config/config.o"
 	@echo "... config/config.i"
 	@echo "... config/config.s"
@@ -327,6 +392,9 @@ help:
 	@echo "... models/user/user.o"
 	@echo "... models/user/user.i"
 	@echo "... models/user/user.s"
+	@echo "... tests/create_mock_data.o"
+	@echo "... tests/create_mock_data.i"
+	@echo "... tests/create_mock_data.s"
 .PHONY : help
 
 

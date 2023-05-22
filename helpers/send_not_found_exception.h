@@ -7,6 +7,7 @@
 
 void send_not_found_exception(std::string message, std::string instance, Poco::Net::HTTPServerResponse &response)
 {
+    std::cout << message << std::endl;
     response.setStatus(Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
     Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
     json->set("type", "/errors/not_found");
