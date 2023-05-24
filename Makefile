@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/justspace/share
+CMAKE_SOURCE_DIR = /home/justspace/MAI-HL-Labs
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/justspace/share
+CMAKE_BINARY_DIR = /home/justspace/MAI-HL-Labs
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/justspace/share/CMakeFiles /home/justspace/share//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/justspace/MAI-HL-Labs/CMakeFiles /home/justspace/MAI-HL-Labs//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/justspace/share/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/justspace/MAI-HL-Labs/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -142,12 +142,26 @@ create_mock_data/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/create_mock_data.dir/build.make CMakeFiles/create_mock_data.dir/build
 .PHONY : create_mock_data/fast
 
+#=============================================================================
+# Target rules for targets named writer
+
+# Build rule for target.
+writer: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 writer
+.PHONY : writer
+
+# fast build rule for target.
+writer/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/build
+.PHONY : writer/fast
+
 cache/cache.o: cache/cache.cpp.o
 .PHONY : cache/cache.o
 
 # target to build an object file
 cache/cache.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/cache/cache.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/cache/cache.cpp.o
 .PHONY : cache/cache.cpp.o
 
 cache/cache.i: cache/cache.cpp.i
@@ -156,6 +170,7 @@ cache/cache.i: cache/cache.cpp.i
 # target to preprocess a source file
 cache/cache.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/cache/cache.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/cache/cache.cpp.i
 .PHONY : cache/cache.cpp.i
 
 cache/cache.s: cache/cache.cpp.s
@@ -164,6 +179,7 @@ cache/cache.s: cache/cache.cpp.s
 # target to generate assembly for a file
 cache/cache.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/cache/cache.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/cache/cache.cpp.s
 .PHONY : cache/cache.cpp.s
 
 config/config.o: config/config.cpp.o
@@ -172,6 +188,7 @@ config/config.o: config/config.cpp.o
 # target to build an object file
 config/config.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/config/config.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/config/config.cpp.o
 .PHONY : config/config.cpp.o
 
 config/config.i: config/config.cpp.i
@@ -180,6 +197,7 @@ config/config.i: config/config.cpp.i
 # target to preprocess a source file
 config/config.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/config/config.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/config/config.cpp.i
 .PHONY : config/config.cpp.i
 
 config/config.s: config/config.cpp.s
@@ -188,6 +206,7 @@ config/config.s: config/config.cpp.s
 # target to generate assembly for a file
 config/config.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/config/config.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/config/config.cpp.s
 .PHONY : config/config.cpp.s
 
 database/database.o: database/database.cpp.o
@@ -196,6 +215,7 @@ database/database.o: database/database.cpp.o
 # target to build an object file
 database/database.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/database/database.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/database/database.cpp.o
 .PHONY : database/database.cpp.o
 
 database/database.i: database/database.cpp.i
@@ -204,6 +224,7 @@ database/database.i: database/database.cpp.i
 # target to preprocess a source file
 database/database.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/database/database.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/database/database.cpp.i
 .PHONY : database/database.cpp.i
 
 database/database.s: database/database.cpp.s
@@ -212,6 +233,7 @@ database/database.s: database/database.cpp.s
 # target to generate assembly for a file
 database/database.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/database/database.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/database/database.cpp.s
 .PHONY : database/database.cpp.s
 
 main.o: main.cpp.o
@@ -244,6 +266,7 @@ models/chat/chat.o: models/chat/chat.cpp.o
 # target to build an object file
 models/chat/chat.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/models/chat/chat.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/models/chat/chat.cpp.o
 .PHONY : models/chat/chat.cpp.o
 
 models/chat/chat.i: models/chat/chat.cpp.i
@@ -252,6 +275,7 @@ models/chat/chat.i: models/chat/chat.cpp.i
 # target to preprocess a source file
 models/chat/chat.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/models/chat/chat.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/models/chat/chat.cpp.i
 .PHONY : models/chat/chat.cpp.i
 
 models/chat/chat.s: models/chat/chat.cpp.s
@@ -260,6 +284,7 @@ models/chat/chat.s: models/chat/chat.cpp.s
 # target to generate assembly for a file
 models/chat/chat.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/models/chat/chat.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/models/chat/chat.cpp.s
 .PHONY : models/chat/chat.cpp.s
 
 models/message/message.o: models/message/message.cpp.o
@@ -268,6 +293,7 @@ models/message/message.o: models/message/message.cpp.o
 # target to build an object file
 models/message/message.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/models/message/message.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/models/message/message.cpp.o
 .PHONY : models/message/message.cpp.o
 
 models/message/message.i: models/message/message.cpp.i
@@ -276,6 +302,7 @@ models/message/message.i: models/message/message.cpp.i
 # target to preprocess a source file
 models/message/message.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/models/message/message.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/models/message/message.cpp.i
 .PHONY : models/message/message.cpp.i
 
 models/message/message.s: models/message/message.cpp.s
@@ -284,6 +311,7 @@ models/message/message.s: models/message/message.cpp.s
 # target to generate assembly for a file
 models/message/message.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/models/message/message.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/models/message/message.cpp.s
 .PHONY : models/message/message.cpp.s
 
 models/post/post.o: models/post/post.cpp.o
@@ -292,6 +320,7 @@ models/post/post.o: models/post/post.cpp.o
 # target to build an object file
 models/post/post.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/models/post/post.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/models/post/post.cpp.o
 .PHONY : models/post/post.cpp.o
 
 models/post/post.i: models/post/post.cpp.i
@@ -300,6 +329,7 @@ models/post/post.i: models/post/post.cpp.i
 # target to preprocess a source file
 models/post/post.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/models/post/post.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/models/post/post.cpp.i
 .PHONY : models/post/post.cpp.i
 
 models/post/post.s: models/post/post.cpp.s
@@ -308,6 +338,7 @@ models/post/post.s: models/post/post.cpp.s
 # target to generate assembly for a file
 models/post/post.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/models/post/post.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/models/post/post.cpp.s
 .PHONY : models/post/post.cpp.s
 
 models/user/user.o: models/user/user.cpp.o
@@ -316,6 +347,7 @@ models/user/user.o: models/user/user.cpp.o
 # target to build an object file
 models/user/user.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/models/user/user.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/models/user/user.cpp.o
 .PHONY : models/user/user.cpp.o
 
 models/user/user.i: models/user/user.cpp.i
@@ -324,6 +356,7 @@ models/user/user.i: models/user/user.cpp.i
 # target to preprocess a source file
 models/user/user.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/models/user/user.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/models/user/user.cpp.i
 .PHONY : models/user/user.cpp.i
 
 models/user/user.s: models/user/user.cpp.s
@@ -332,6 +365,7 @@ models/user/user.s: models/user/user.cpp.s
 # target to generate assembly for a file
 models/user/user.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/social_network.dir/build.make CMakeFiles/social_network.dir/models/user/user.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/models/user/user.cpp.s
 .PHONY : models/user/user.cpp.s
 
 tests/create_mock_data.o: tests/create_mock_data.cpp.o
@@ -358,6 +392,30 @@ tests/create_mock_data.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/create_mock_data.dir/build.make CMakeFiles/create_mock_data.dir/tests/create_mock_data.cpp.s
 .PHONY : tests/create_mock_data.cpp.s
 
+writer.o: writer.cpp.o
+.PHONY : writer.o
+
+# target to build an object file
+writer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/writer.cpp.o
+.PHONY : writer.cpp.o
+
+writer.i: writer.cpp.i
+.PHONY : writer.i
+
+# target to preprocess a source file
+writer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/writer.cpp.i
+.PHONY : writer.cpp.i
+
+writer.s: writer.cpp.s
+.PHONY : writer.s
+
+# target to generate assembly for a file
+writer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/writer.dir/build.make CMakeFiles/writer.dir/writer.cpp.s
+.PHONY : writer.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -368,6 +426,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... create_mock_data"
 	@echo "... social_network"
+	@echo "... writer"
 	@echo "... cache/cache.o"
 	@echo "... cache/cache.i"
 	@echo "... cache/cache.s"
@@ -395,6 +454,9 @@ help:
 	@echo "... tests/create_mock_data.o"
 	@echo "... tests/create_mock_data.i"
 	@echo "... tests/create_mock_data.s"
+	@echo "... writer.o"
+	@echo "... writer.i"
+	@echo "... writer.s"
 .PHONY : help
 
 

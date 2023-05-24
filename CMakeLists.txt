@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.2)
 project(hl_server C CXX)
 
 SET (service "social_network")
+set (writer "writer")
 set (STD_CXX "c++17")
 set (REDISCPP_FLAGS "-DREDISCPP_HEADER_ONLY=ON")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall -std=${STD_CXX} ${REDISCPP_FLAGS}")
@@ -13,7 +14,8 @@ set (CMAKE_BUILD_TYPE RelWithDebInfo)
 find_package(OpenSSL)
 find_package(Threads)
 find_package(ZLIB)
-find_package(Poco REQUIRED COMPONENTS Foundation Util Net XML JSON Crypto NetSSL)
+find_package(Poco REQUIRED COMPONENTS Foundation Util Net XML JSON Crypto NetSSL Data)
+find_package(CppKafka REQUIRED)
 
 
 if(NOT ${Poco_FOUND})
@@ -39,6 +41,15 @@ add_executable(${service} main.cpp
 
 add_executable(create_mock_data tests/create_mock_data.cpp)
 
+add_executable(${writer} writer.cpp
+        cache/cache.cpp
+        config/config.cpp
+        database/database.cpp
+        models/chat/chat.cpp
+        models/message/message.cpp
+        models/post/post.cpp
+        models/user/user.cpp)
+
 target_include_directories(${service} PRIVATE "${CMAKE_BINARY_DIR}")
 target_compile_options(${service} PRIVATE -Wall -Wextra -pedantic -Werror )
 set_target_properties(${service} PROPERTIES LINKER_LANGUAGE CXX)
@@ -50,7 +61,9 @@ target_link_libraries(${service} PRIVATE
         "PocoData"
         "PocoDataMySQL"
         "mysqlclient"
-        ZLIB::ZLIB)
+        ZLIB::ZLIB
+        "rdkafka++"
+        CppKafka::cppkafka)
 
 
 
@@ -66,3 +79,18 @@ target_link_libraries(create_mock_data PRIVATE
         "PocoDataMySQL"
         "mysqlclient"
         ZLIB::ZLIB)
+
+target_include_directories(${writer} PRIVATE "${CMAKE_BINARY_DIR}")
+target_compile_options(${writer} PRIVATE -Wall -Wextra -pedantic -Werror )
+set_target_properties(${writer} PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(${writer} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
+
+target_link_libraries(${writer} PRIVATE
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${Poco_LIBRARIES}
+        "PocoData"
+        "PocoDataMySQL"
+        "mysqlclient"
+        ZLIB::ZLIB
+        "rdkafka++"
+        CppKafka::cppkafka)

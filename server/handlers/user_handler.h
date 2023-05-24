@@ -111,6 +111,9 @@ class UserHandler : public HTTPRequestHandler
 
                 else if (path == "/user" && method == HTTPRequest::HTTP_POST)
                 {
+                    response.setStatus(Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK);
+                    std::ostream& stream = response.send();
+
                     models::User user;
                     std::string first_name = "";
                     std::string last_name = "";
@@ -134,9 +137,7 @@ class UserHandler : public HTTPRequestHandler
                         birth_day = object->getNullableValue<std::string>("birth_day");
                         
                     } catch (std::exception &e) {
-                        std::cout << "Error parsing request body: " << e.what() << std::endl;
-                        response.setStatus(HTTPResponse::HTTP_BAD_REQUEST);
-                        response.send();
+                        stream << "{\"error_message\":\"" + (std::string)e.what() + "\"}";
                         return;
                     }
 
@@ -148,11 +149,19 @@ class UserHandler : public HTTPRequestHandler
                     if (!phone_number.isNull()) user.set_phone_number(phone_number.value());
                     if (!birth_day.isNull()) user.set_birth_day(birth_day.value());
 
-                    user.save_to_db();
-                    user.save_to_cache();
-
-                    response.setStatus(Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK);
-                    response.send() << user.get_id();
+                    try
+                    {
+                        int i = 0;
+                        user.send_to_queue();
+                        std::cout << "Send to queue: " << std::to_string(++i) << std::endl;
+                        stream << "{\"result\":true}";
+                        return;
+                    }
+                    catch(const std::exception& e)
+                    {
+                        stream << "{\"error_message\":\"" + (std::string)e.what() + "\"}";
+                        return;
+                    }
                     return;
                 }
 
@@ -212,7 +221,7 @@ class UserHandler : public HTTPRequestHandler
                     }
                     else
                     {
-                        send_not_found_exception("User with " + by + " = " + param + "was not found", "/user", response);
+                        send_not_found_exception("User with " + by + " = " + param + " was not found", "/user", response);
                     }
 
                     return;
@@ -224,7 +233,7 @@ class UserHandler : public HTTPRequestHandler
 
                     if (by.empty())
                     {
-                        send_not_found_exception("Missing `by` param", "/user/auth", response);
+                        send_not_found_exception("Missing `by` param", "/user/find", response);
                         return;
                     }
 

@@ -40,6 +40,7 @@ namespace models
             Poco::JSON::Object::Ptr to_json() const;
             void save_to_db();
             void save_to_cache();
+            void send_to_queue();
 
             long get_id() const;
             std::string get_first_name() const;

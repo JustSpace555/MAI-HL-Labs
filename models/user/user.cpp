@@ -10,9 +10,14 @@
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
 
+#include <cppkafka/configuration.h>
+#include <cppkafka/producer.h>
+#include <cppkafka/message_builder.h>
+
 #include <sstream>
 #include <exception>
 #include <future>
+#include <mutex>
 
 using namespace Poco::Data::Keywords;
 using Poco::Data::Session;
@@ -338,6 +343,50 @@ namespace models
         Poco::JSON::Stringifier::stringify(to_json(), stream);
         std::string json = stream.str();
         database::Cache::get_instance().put(user_id, json);
+    }
+
+    void User::send_to_queue()
+    {
+        static cppkafka::Configuration configuration =
+        {
+            { "metadata.broker.list", Config::get_instanse().get_queue_host() },
+            { "acks", "all" }
+        };
+        static cppkafka::Producer producer(configuration);
+        static std::mutex mutex;
+        static int message_key{0};
+        using header = cppkafka::MessageBuilder::HeaderType;
+
+        std::lock_guard<std::mutex> lock(mutex);
+        std::stringstream stream;
+        Poco::JSON::Stringifier::stringify(to_json(), stream);
+        std::string message = stream.str();
+        bool sent = false;
+
+        cppkafka::MessageBuilder builder(Config::get_instanse().get_queue_topic());
+        std::string message_key_str = std::to_string(++message_key);
+        builder.key(message_key_str);
+        builder.header(
+            header {"some_header", "some_header"}
+        );
+        builder.payload(message);
+        producer.set_timeout(std::chrono::milliseconds(10000));
+        producer.produce(builder);
+        // producer.flush();
+
+        while (!sent)
+        {
+            try
+            {
+                producer.produce(builder);
+                sent = true;
+            }
+            catch (std::exception &e)
+            {
+                std::string exception_message = e.what();
+                std::cout << "Kafka exception: " + exception_message << std::endl;
+            }
+        }
     }
 
     long User::table_size()
