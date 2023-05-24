@@ -6,4 +6,4 @@ CMakeCache.txt
 social_network
 build
 rdkafka_version_test.cpp
-writer
+./writer
